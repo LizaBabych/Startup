@@ -1,5 +1,4 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { countTotal } from '../helpers/getCountTotal';
 import { UsersService } from '../users/users.service';
 import { InvestService } from '../invest/invest.service';
 import { AmountService } from '../amount/amount.service';
@@ -12,7 +11,10 @@ export class AdminService {
     private amountService: AmountService,
   ) {}
 
-  async getStatus(): Promise<any> {
+  async getStatus(): Promise<{
+    totalBalance: number;
+    totalUsers: number;
+  }> {
     const users = await this.usersService.findAllUsers();
     const balance = await this.amountService.findOne();
     return {
@@ -21,7 +23,7 @@ export class AdminService {
     };
   }
 
-  async takePartOfMoney(amount: number) {
+  async takePartOfMoney(amount: number): Promise<{ rest: number }> {
     const totalBalance = await this.amountService.findOne();
     if (amount > totalBalance.total) {
       throw new HttpException('Money is not enough', 400);

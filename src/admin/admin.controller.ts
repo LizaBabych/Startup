@@ -18,7 +18,7 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RoleGuard(Role.Admin))
   @Post('take-part')
-  async getUserAmount(@Request() req: any) {
+  async getUserAmount(@Request() req) {
     return this.adminService.takePartOfMoney(req.body.amount);
   }
 }

@@ -1,14 +1,4 @@
-import {
-  Entity,
-  Column,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  JoinColumn,
-  OneToMany,
-  PrimaryColumn,
-  ManyToOne,
-  JoinTable,
-} from 'typeorm';
+import { Entity, Column, OneToMany, PrimaryColumn } from 'typeorm';
 import { Investment } from './investment.entity';
 import { Role } from '../enums/role.enum';
 

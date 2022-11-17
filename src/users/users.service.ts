@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import { Role } from '../enums/role.enum';
-import { Investment } from '../entities/investment.entity';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +20,7 @@ export class UsersService {
     return this.usersRepository.findOneBy({ username });
   }
 
-  async findUserById(userId: string): Promise<any> {
+  async findUserById(userId: string): Promise<User> {
     const user = await this.usersRepository.findOneBy({ userId });
     if (!user) {
       throw new NotFoundException({
@@ -37,13 +36,17 @@ export class UsersService {
     });
   }
 
-  async getAdmin(): Promise<any> {
+  async getAdmin(): Promise<User> {
     return await this.usersRepository.findOne({
       where: { role: Role.Admin },
     });
   }
 
-  async addUser(username: string, password: string, role?: Role): Promise<any> {
+  async addUser(
+    username: string,
+    password: string,
+    role?: Role,
+  ): Promise<Pick<User, 'username' | 'userId'>> {
     const newUser = new User();
     newUser.userId = uuidv4();
     newUser.username = username;

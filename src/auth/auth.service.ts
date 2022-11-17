@@ -3,6 +3,7 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '../enums/role.enum';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -11,7 +12,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
+  async validateUser(
+    username: string,
+    pass: string,
+  ): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findOne(username);
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
@@ -20,7 +24,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
+  async login(user: User): Promise<{ access_token: string; userId: string }> {
     const payload = {
       username: user.username,
       sub: user.userId,
@@ -31,7 +35,11 @@ export class AuthService {
     };
   }
 
-  async addUser(username: string, password: string, role?: Role): Promise<any> {
+  async addUser(
+    username: string,
+    password: string,
+    role?: Role,
+  ): Promise<Pick<User, 'username' | 'userId'>> {
     const isUserExist = await this.usersService.findOne(username);
     if (isUserExist) {
       throw new ConflictException('User already exist');

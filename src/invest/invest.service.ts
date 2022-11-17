@@ -2,7 +2,6 @@ import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { Investment } from '../entities/investment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
-import { countTotal } from '../helpers/getCountTotal';
 import { UsersService } from '../users/users.service';
 import { AmountService } from '../amount/amount.service';
 import { Role } from '../enums/role.enum';
@@ -16,17 +15,20 @@ export class InvestService {
     private usersService: UsersService,
   ) {}
 
-  async saveInvestment(investments: Investment[]): Promise<any> {
-    await this.investmentRepository.save(investments);
+  async saveInvestment(investments: Investment[]): Promise<Investment[]> {
+    return await this.investmentRepository.save(investments);
   }
 
-  async getAllCurrentInvestments(): Promise<any> {
+  async getAllCurrentInvestments(): Promise<Investment[]> {
     return await this.investmentRepository.find({
       where: { user: Not(IsNull()) },
     });
   }
 
-  async invest(userId: string, sum: number): Promise<any> {
+  async invest(
+    userId: string,
+    sum: number,
+  ): Promise<{ date: Date; amount: number }> {
     const user = await this.usersService.findUserById(userId);
     user.role = Role.Investor;
     await this.usersService.saveUser(user);
@@ -40,10 +42,22 @@ export class InvestService {
     return { date: investment.date, amount: investment.amount };
   }
 
-  async getAmount(userId: string): Promise<any> {
+  countTotal = (amounts: Investment[]): number => {
+    return amounts.reduce((acc, i) => {
+      return acc + i.amount;
+    }, 0);
+  };
+
+  async getAmount(userId: string): Promise<{
+    totalAmount: number;
+    investments: Array<{
+      amount: number;
+      date: Date;
+    }>;
+  }> {
     const user = await this.usersService.findUserById(userId);
     const amounts = await this.investmentRepository.find({ where: { user } });
-    const total = countTotal(amounts);
+    const total = this.countTotal(amounts);
     // Add percents from invited friends
     return {
       totalAmount: total,
@@ -70,11 +84,13 @@ export class InvestService {
     return; // await this.userRepository.save(user);
   }
 
-  async deleteInvestment(userId: string): Promise<any> {
+  async deleteInvestment(userId: string): Promise<{
+    totalAmount: number;
+  }> {
     const user = await this.usersService.findUserById(userId);
     const balance = await this.amountService.findOne();
     const amounts = await this.investmentRepository.find({ where: { user } });
-    const userTotal = countTotal(amounts);
+    const userTotal = this.countTotal(amounts);
     if (userTotal > balance.total) {
       throw new HttpException("You can't take your money for now", 400);
     }
@@ -82,6 +98,6 @@ export class InvestService {
     balance.total = balance.total - userTotal;
     await this.amountService.saveAmount(balance);
     await this.investmentRepository.save(amounts);
-    return { totalAmounts: userTotal };
+    return { totalAmount: userTotal };
   }
 }

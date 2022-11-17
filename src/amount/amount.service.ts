@@ -1,9 +1,8 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Amount } from '../entities/amount.entity';
 import { Investment } from '../entities/investment.entity';
-import { InvestService } from '../invest/invest.service';
 
 @Injectable()
 export class AmountService {
@@ -14,11 +13,11 @@ export class AmountService {
 
   private totalId: string;
 
-  async findOne(): Promise<any> {
+  async findOne(): Promise<Amount> {
     return await this.amountRepository.findOneBy({ id: this.totalId });
   }
 
-  async saveAmount(amount: Amount): Promise<any> {
+  async saveAmount(amount: Amount): Promise<Amount> {
     return await this.amountRepository.save(amount);
   }
 
@@ -33,13 +32,5 @@ export class AmountService {
     const result = await this.amountRepository.save(amount);
     this.totalId = result.id;
     return await this.amountRepository.save(amount);
-  }
-
-  async getAllAmount(): Promise<Amount[]> {
-    return await this.amountRepository.find({
-      where: {
-        id: Not(IsNull()),
-      },
-    });
   }
 }

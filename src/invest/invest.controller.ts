@@ -18,21 +18,21 @@ export class InvestController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RoleGuard([Role.Investor, Role.User]))
   @Post()
-  async invest(@Request() req: any) {
+  async invest(@Request() req) {
     return this.investmentService.invest(req.user.userId, req.body.amount);
   }
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(RoleGuard(Role.Investor))
   @Get()
-  async getUserAmount(@Request() req: any) {
+  async getUserAmount(@Request() req) {
     return this.investmentService.getAmount(req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(RoleGuard(Role.Investor))
   @Post('invite')
-  async inviteUserById(@Request() req: any) {
+  async inviteUserById(@Request() req) {
     return this.investmentService.inviteFriend(
       req.user.userId,
       req.body.friendId,
@@ -42,7 +42,7 @@ export class InvestController {
   @UseGuards(JwtAuthGuard)
   @UseGuards(RoleGuard(Role.Investor))
   @Delete()
-  async takeAllEarnings(@Request() req: any) {
+  async takeAllEarnings(@Request() req) {
     return this.investmentService.deleteInvestment(req.user.userId);
   }
 }
