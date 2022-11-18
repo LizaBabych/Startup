@@ -24,6 +24,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
+    description: 'Created',
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
@@ -41,6 +42,7 @@ export class AuthController {
 
   @ApiResponse({
     status: HttpStatus.OK,
+    description: 'Success',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
