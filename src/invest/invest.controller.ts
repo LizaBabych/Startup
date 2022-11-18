@@ -45,7 +45,6 @@ export class InvestController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Success',
-    type: Investment,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
