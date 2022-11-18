@@ -67,10 +67,8 @@ export class UsersService {
     newUser.username = username;
     newUser.password = password;
 
-    const inviter = await this.findUserById(referral);
-
     if (referral) {
-      newUser.inviter = inviter;
+      newUser.inviter = await this.findUserById(referral);
     }
 
     if (role) {
