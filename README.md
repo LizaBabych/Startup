@@ -32,7 +32,21 @@
 $ npm install
 ```
 
-## Running the app
+## Fill .env file according env.example
+
+```bash
+HOST:
+USERNAME:
+PASSWORD:
+PORT:
+DATABASE:
+JWT_SECRET:
+TOKEN_EXPIRATION:
+ADMIN_USERNAME:
+ADMIN_PASSWORD:
+```
+
+## Run the app
 
 ```bash
 # development
@@ -44,6 +58,12 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+
+# Server listen port 3000
+
+# Swagger documentation
+
+[Swagger](http://localhost:3000/api/)
 
 ## Test
 

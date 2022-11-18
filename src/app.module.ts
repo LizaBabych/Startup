@@ -14,6 +14,7 @@ import { Amount } from './entities/amount.entity';
 import { AmountModule } from './amount/amount.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PercentsService } from './percents/percents.service';
+import { InviteModule } from './invite/invite.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PercentsService } from './percents/percents.service';
     InvestModule,
     AdminModule,
     AmountModule,
+    InviteModule,
   ],
   controllers: [AppController],
   providers: [AppService, PercentsService],

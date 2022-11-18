@@ -80,10 +80,6 @@ export class InvestService {
     };
   }
 
-  getReferral(userId: string): { referral: string } {
-    return { referral: `${process.env.URL}/auth/signup/?userId=${userId}` };
-  }
-
   async deleteInvestment(userId: string): Promise<{
     totalAmount: number;
   }> {
