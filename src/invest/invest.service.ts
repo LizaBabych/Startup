@@ -5,6 +5,8 @@ import { IsNull, Not, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { AmountService } from '../amount/amount.service';
 import { Role } from '../enums/role.enum';
+import { User } from '../entities/user.entity';
+import { AmountType } from '../enums/amountType.enum';
 
 @Injectable()
 export class InvestService {
@@ -25,9 +27,16 @@ export class InvestService {
     });
   }
 
+  async getInvestmentsByUser(user: User): Promise<Investment[]> {
+    return await this.investmentRepository.find({
+      where: { user },
+    });
+  }
+
   async invest(
     userId: string,
     sum: number,
+    type: AmountType = AmountType.Operation,
   ): Promise<{ date: Date; amount: number }> {
     const user = await this.usersService.findUserById(userId);
     user.role = Role.Investor;
@@ -36,6 +45,7 @@ export class InvestService {
     newInvestment.amount = sum;
     newInvestment.date = new Date();
     newInvestment.user = user;
+    newInvestment.type = type;
     newInvestment.amounts = await this.amountService.addAmount(newInvestment);
     const investment = await this.investmentRepository.save(newInvestment);
     await this.usersService.saveUser(user);
@@ -70,18 +80,8 @@ export class InvestService {
     };
   }
 
-  async inviteFriend(userId: string, friendId: string): Promise<any> {
-    const user = await this.usersService.findUserById(userId);
-    // const friend = await this.usersService.findUserById(friendId);
-    // const amounts = await this.investmentRepository.find({ where: { user } });
-    // Check if user is not investor
-    if (user.role !== Role.Investor) {
-      throw new ForbiddenException({
-        message:
-          'You are not investor. You can invite friends when became investor',
-      });
-    }
-    return; // await this.userRepository.save(user);
+  getReferral(userId: string): { referral: string } {
+    return { referral: `${process.env.URL}/auth/signup/?userId=${userId}` };
   }
 
   async deleteInvestment(userId: string): Promise<{

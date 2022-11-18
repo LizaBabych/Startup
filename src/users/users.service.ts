@@ -36,6 +36,20 @@ export class UsersService {
     });
   }
 
+  async getAllInviters(): Promise<User[]> {
+    return await this.usersRepository.find({
+      where: { invited_users: true },
+      select: ['userId', 'invited_users'],
+    });
+  }
+
+  async getAllInvitedUsersByInviterId(inviter: User): Promise<User[]> {
+    return await this.usersRepository.find({
+      where: { inviter },
+      select: ['userId', 'inviter'],
+    });
+  }
+
   async getAdmin(): Promise<User> {
     return await this.usersRepository.findOne({
       where: { role: Role.Admin },
@@ -46,15 +60,25 @@ export class UsersService {
     username: string,
     password: string,
     role?: Role,
+    referral?: string,
   ): Promise<Pick<User, 'username' | 'userId'>> {
     const newUser = new User();
     newUser.userId = uuidv4();
     newUser.username = username;
     newUser.password = password;
+
+    const inviter = await this.findUserById(referral);
+
+    if (referral) {
+      newUser.inviter = inviter;
+    }
+
     if (role) {
       newUser.role = role;
     }
+
     const user = await this.usersRepository.save(newUser);
+
     return {
       username: user.username,
       userId: user.userId,

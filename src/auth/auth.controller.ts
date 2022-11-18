@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Request,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UserDTO } from './dto/user.dto';
@@ -14,7 +21,12 @@ export class AuthController {
   }
 
   @Post('signup')
-  async signUp(@Body() user: UserDTO) {
-    return await this.authService.addUser(user.username, user.password);
+  async signUp(@Body() user: UserDTO, @Query() query) {
+    return await this.authService.addUser(
+      user.username,
+      user.password,
+      null,
+      query.referral,
+    );
   }
 }

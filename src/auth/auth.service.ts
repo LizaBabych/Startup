@@ -39,12 +39,18 @@ export class AuthService {
     username: string,
     password: string,
     role?: Role,
+    referral?: string,
   ): Promise<Pick<User, 'username' | 'userId'>> {
     const isUserExist = await this.usersService.findOne(username);
     if (isUserExist) {
       throw new ConflictException('User already exist');
     }
     const passwordHash = password ? await bcrypt.hash(password, 11) : null;
-    return await this.usersService.addUser(username, passwordHash, role);
+    return await this.usersService.addUser(
+      username,
+      passwordHash,
+      role,
+      referral,
+    );
   }
 }

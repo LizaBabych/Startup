@@ -1,4 +1,11 @@
-import { Entity, Column, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  OneToMany,
+  PrimaryColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Investment } from './investment.entity';
 import { Role } from '../enums/role.enum';
 
@@ -22,4 +29,11 @@ export class User {
 
   @OneToMany(() => Investment, (investment) => investment.user)
   investment: Investment[];
+
+  @OneToMany(() => User, (user) => user.inviter)
+  invited_users: User[];
+
+  @ManyToOne(() => User, (user) => user.invited_users)
+  @JoinColumn({ name: 'inviter' })
+  inviter: User;
 }

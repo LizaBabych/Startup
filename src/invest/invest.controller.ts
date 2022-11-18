@@ -31,12 +31,9 @@ export class InvestController {
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(RoleGuard(Role.Investor))
-  @Post('invite')
+  @Get('invite')
   async inviteUserById(@Request() req) {
-    return this.investmentService.inviteFriend(
-      req.user.userId,
-      req.body.friendId,
-    );
+    return this.investmentService.getReferral(req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)
