@@ -30,9 +30,11 @@ export class PercentsService {
     this.logger.debug(`${totalCounter} percents was added`);
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async countUserPercent() {
     const inviters = await this.usersService.getAllInviters();
+    const balance = await this.amountService.findOne();
+
     inviters.map(async (inviter) => {
       const users = await this.usersService.getAllInvitedUsersByInviterId(
         inviter,
@@ -46,14 +48,18 @@ export class PercentsService {
           (acc, i) => acc + i.percents,
           0,
         );
-        await this.investmentService.invest(
-          inviter.userId,
-          totalDailyPercents / 10,
-          AmountType.Percent,
-        );
-        totalDailyPercents = 0;
+        if (totalDailyPercents) {
+          await this.investmentService.invest(
+            inviter.userId,
+            totalDailyPercents / 10,
+            AmountType.Percent,
+          );
+          balance.total += totalDailyPercents;
+          this.logger.debug(`${totalDailyPercents} percents was added`);
+          totalDailyPercents = 0;
+        }
       });
-      this.logger.debug(`${totalDailyPercents} percents was added`);
     });
+    await this.amountService.saveAmount(balance);
   }
 }
