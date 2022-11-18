@@ -30,24 +30,30 @@ export class PercentsService {
     this.logger.debug(`${totalCounter} percents was added`);
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async countUserPercent() {
     const inviters = await this.usersService.getAllInviters();
     const balance = await this.amountService.findOne();
 
+    // Find all inviters
     inviters.map(async (inviter) => {
       const users = await this.usersService.getAllInvitedUsersByInviterId(
         inviter,
       );
       let totalDailyPercents = 0;
+
+      // Find all invited users by inviters
       users.map(async (user) => {
+        // Find all investments by invited user
         const investments = await this.investmentService.getInvestmentsByUser(
           user,
         );
+        // Count all daily percents
         totalDailyPercents += investments.reduce(
           (acc, i) => acc + i.percents,
           0,
         );
+
         if (totalDailyPercents) {
           await this.investmentService.invest(
             inviter.userId,
